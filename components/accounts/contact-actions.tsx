@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Copy, MessageCircle, MessagesSquare, Send, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toaster";
@@ -7,9 +8,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export function ContactActions({ title, whatsappUrl, telegramUrl }: { title: string; whatsappUrl?: string; telegramUrl?: string }) {
   const toast = useToast();
-  const message = encodeURIComponent(`Hi, I am interested in ${title} from Seven BGMI Store.`);
+  const [pageUrl, setPageUrl] = React.useState("");
+
+  React.useEffect(() => {
+    setPageUrl(window.location.href);
+  }, []);
+
+  const message = encodeURIComponent(`Hi, I am interested in ${pageUrl} from Seven BGMI Store.`);
   const whatsappHref = whatsappUrl ? `${whatsappUrl}${whatsappUrl.includes("?") ? "&" : "?"}text=${message}` : undefined;
-  const hasSingleOption = Boolean(whatsappHref) !== Boolean(telegramUrl);
+  const telegramHref = telegramUrl ? `${telegramUrl}${telegramUrl.includes("?") ? "&" : "?"}text=${message}` : undefined;
+  const hasSingleOption = Boolean(whatsappHref) !== Boolean(telegramHref);
 
   async function share() {
     const url = window.location.href;
@@ -23,10 +31,10 @@ export function ContactActions({ title, whatsappUrl, telegramUrl }: { title: str
 
   return (
     <div className="flex flex-wrap gap-3">
-      {whatsappHref || telegramUrl ? (
+      {whatsappHref || telegramHref ? (
         hasSingleOption ? (
           <Button asChild>
-            <a href={whatsappHref || telegramUrl} target="_blank" rel="noreferrer">
+            <a href={whatsappHref || telegramHref} target="_blank" rel="noreferrer">
               <MessagesSquare className="h-4 w-4" />
               Talk to Seller
             </a>
@@ -47,7 +55,7 @@ export function ContactActions({ title, whatsappUrl, telegramUrl }: { title: str
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href={telegramUrl} target="_blank" rel="noreferrer">
+                <a href={telegramHref} target="_blank" rel="noreferrer">
                   <Send className="h-4 w-4" />
                   Telegram
                 </a>
