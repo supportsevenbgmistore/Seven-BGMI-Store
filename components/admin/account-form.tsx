@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import type { PutBlobResult } from "@vercel/blob";
 import { upload } from "@vercel/blob/client";
@@ -64,6 +65,8 @@ export function AccountForm({
   action: (state: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction, pending] = useActionState(action, emptyState);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [media, setMedia] = React.useState<MediaAsset[]>(account?.media || []);
   const [uploading, setUploading] = React.useState(false);
   const [uploadQueue, setUploadQueue] = React.useState<UploadItem[]>([]);
@@ -89,31 +92,19 @@ export function AccountForm({
     setValues((current) => ({ ...current, [name]: value }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.set("title", values.title);
-    formData.set("description", values.description);
-    formData.set("price", String(values.price));
-    formData.set("uid", values.uid);
-    formData.set("collectionLevel", String(values.collectionLevel));
-    formData.set("mythics", String(values.mythics));
-    formData.set("ultimateSets", String(values.ultimateSets));
-    formData.set("upgradeableGuns", String(values.upgradeableGuns));
-    formData.set("superCars", String(values.superCars));
-    formData.set("conquerorTitles", String(values.conquerorTitles));
-    formData.set("ultimateRoyaleTitles", String(values.ultimateRoyaleTitles));
-    formData.set("status", values.status);
-    if (values.featured) formData.set("featured", "on");
-    formData.set("media", JSON.stringify(media));
-    formAction(formData);
-  }
-
   React.useEffect(() => {
     if (state.message) {
       toast({ title: state.ok ? "Saved" : "Check the form", description: state.message, variant: state.ok ? "default" : "error" });
     }
   }, [state, toast]);
+
+  React.useEffect(() => {
+    if (searchParams.get("created") === "1") {
+      toast({ title: "Saved", description: "Listing created." });
+      router.replace(`/admin/accounts/${account?.id}/edit`, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -243,7 +234,8 @@ export function AccountForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_0.75fr]">
+    <form action={formAction} className="grid gap-6 lg:grid-cols-[1fr_0.75fr]">
+      <input type="hidden" name="media" value={JSON.stringify(media)} />
       <Card className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field

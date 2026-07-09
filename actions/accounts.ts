@@ -72,7 +72,7 @@ export async function createAccountAction(_prev: ActionState, formData: FormData
     const id = await createAccount(parsed.data);
     revalidatePath("/");
     revalidatePath("/admin");
-    redirect(`/admin/accounts/${id}/edit`);
+    redirect(`/admin/accounts/${id}/edit?created=1`);
   } catch (error) {
     if ((error as Error).message === "NEXT_REDIRECT") throw error;
     return { ok: false, message: (error as Error).message };
@@ -102,8 +102,8 @@ export async function deleteAccountAction(id: string) {
   await requireAdmin();
   await deleteAccount(id);
   revalidatePath("/");
-  revalidatePath("/admin");
-  redirect("/admin");
+  revalidatePath("/admin/dashboard");
+  redirect("/admin/dashboard");
 }
 
 export async function markAccountStatusAction(id: string, status: "available" | "sold" | "reserved") {
