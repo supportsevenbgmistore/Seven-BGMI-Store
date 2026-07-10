@@ -49,6 +49,7 @@ export function AccountCard({ account }: { account: AccountListing }) {
 }
 
 function Spec({ icon: Icon, label, value }: { icon: typeof Gem; label: string; value: number }) {
+  if (!value) return null;
   return (
     <div className="flex items-center gap-2 rounded-md bg-black/25 px-2 py-2">
       <Icon className="h-4 w-4 text-red-200" />

@@ -252,7 +252,7 @@ export function AccountForm({
             min="1"
             step="1"
             required
-            value={values.price}
+            value={values.price === 0 ? "" : values.price}
             onChange={(event) => setField("price", event.target.value === "" ? 0 : Number(event.target.value))}
             error={state.errors?.price}
             name="price"
@@ -284,7 +284,7 @@ export function AccountForm({
               type="number"
               min="0"
               name={name}
-              value={values[name]}
+              value={values[name] === 0 ? "" : values[name]}
               onChange={(event) => setField(name, event.target.value === "" ? 0 : Number(event.target.value))}
               error={state.errors?.[name]}
             />

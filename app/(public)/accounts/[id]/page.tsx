@@ -54,7 +54,7 @@ export default async function AccountDetailPage({ params }: PageProps) {
     { label: "Ultimate Royale Titles", value: account.ultimateRoyaleTitles, icon: Shield },
     { label: "Posted Date", value: formatDate(account.createdAt), icon: Calendar },
     { label: "Views", value: account.views, icon: Eye }
-  ];
+  ].filter(({ value }) => value !== 0 && value !== "" && value != null);
 
   const structuredData = {
     "@context": "https://schema.org",
